@@ -1,0 +1,64 @@
+import java.util.*;
+
+class Job {
+    char id;
+    int deadline;
+    int profit;
+
+    public Job(char id, int deadline, int profit) {
+        this.id = id;
+        this.deadline = deadline;
+        this.profit = profit;
+    }
+}
+
+public class JobSequencingGreedy {
+    public static void main(String[] args) {
+        List<Job> jobs = new ArrayList<>();
+        jobs.add(new Job('a', 2, 100));
+        jobs.add(new Job('b', 1, 19));
+        jobs.add(new Job('c', 2, 27));
+        jobs.add(new Job('d', 1, 25));
+        jobs.add(new Job('e', 3, 15));
+
+        jobSequencing(jobs);
+    }
+
+    public static void jobSequencing(List<Job> jobs) {
+        Collections.sort(jobs, (a, b) -> Integer.compare(b.profit, a.profit));
+
+        int maxDeadline = jobs.stream().mapToInt(job -> job.deadline).max().getAsInt();
+        char[] sequence = new char[maxDeadline];
+        boolean[] slot = new boolean[maxDeadline];
+
+        Arrays.fill(slot, false);
+
+        for (Job job : jobs) {
+            for (int i = Math.min(maxDeadline - 1, job.deadline - 1); i >= 0; i--) {
+                if (!slot[i]) {
+                    slot[i] = true;
+                    sequence[i] = job.id;
+                    break;
+                }
+            }
+        }
+
+        int totalProfit = 0;
+        System.out.println("Job Sequence with Deadlines: ");
+        for (char ch : sequence) {
+            if (ch != '\u0000') {
+                System.out.print(ch + " ");
+            }
+        }
+
+        System.out.println("\nJob Profit: ");
+        for (Job job : jobs) {
+            if (new String(sequence).contains(String.valueOf(job.id))) {
+                System.out.print(job.profit + " ");
+                totalProfit += job.profit;
+            }
+        }
+
+        System.out.println("\nTotal Profit: " + totalProfit);
+    }
+}
